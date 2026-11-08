@@ -50,6 +50,14 @@ add_executable(ps3vis WIN32 MACOSX_BUNDLE
 # third_party/vulkan: Khronos Vulkan headers (Vulkan itself is loaded at runtime through SDL)
 target_include_directories(ps3vis PRIVATE src third_party third_party/vulkan)
 target_link_libraries(ps3vis PRIVATE SDL3::SDL3 ffmpeg)
+# Without a CFBundleIdentifier, recent macOS (Sequoia/Tahoe) silently refuses to show native
+# open/save panels (NSOpenPanel) from an app bundle - CMake's default Info.plist leaves it empty
+# unless this is set. Message boxes (NSAlert) aren't affected, which is why only file/folder
+# dialogs were missing. Reusing the Flatpak app ID for consistency.
+set_target_properties(ps3vis PROPERTIES
+    MACOSX_BUNDLE_GUI_IDENTIFIER io.github.ps3vis.Visualizer
+    MACOSX_BUNDLE_BUNDLE_NAME "PS3 Visualizer"
+)
 if(MINGW)
     # No libstdc++/libgcc DLLs to ship alongside the program.
     target_link_options(ps3vis PRIVATE -static-libgcc -static-libstdc++)
