@@ -1,0 +1,41 @@
+MIT License
+
+Copyright (c) 2026 SlopSpawner9000
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+This license covers ps3vis's own source code. It does not cover, and is not
+affected by, the separately-licensed third-party components it builds against
+or bundles:
+
+- SDL3 (zlib license), dynamically linked.
+- FFmpeg (LGPL build), dynamically linked — no statically-linked FFmpeg build
+  is distributed.
+- Khronos Vulkan headers, `third_party/vulkan/` (Apache-2.0 OR MIT, see
+  `third_party/vulkan/LICENSE.md`).
+- stb_image.h, stb_image_write.h, stb_truetype.h, `third_party/` (MIT /
+  public domain, dual-licensed; see each file's header).
+- Bundled UI fallback fonts, `fonts/` (SIL Open Font License 1.1, or the
+  Bitstream Vera license for DejaVu; see `fonts/README.md` and the license
+  file next to each font).
+
+No Sony Interactive Entertainment firmware, system software, or other Sony
+data is included in this repository; see the README's "Legal" section.
