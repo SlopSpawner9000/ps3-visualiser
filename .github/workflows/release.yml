@@ -32,6 +32,24 @@ jobs:
             builds/*.AppImage
             builds/*-portable.tar.gz
 
+  linux-plain:
+    # A plain application folder (just the binary and fonts), no AppImage or Flatpak container -
+    # built in an Arch container since Arch packages SDL3 and FFmpeg directly (see README.md,
+    # "Building"). Dynamically linked against this image's libraries, so unlike the AppImage above
+    # it needs matching (or newer) packages on the target system.
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Install build tools
+        run: pacman -Syu --noconfirm --needed git base-devel cmake ninja sdl3 ffmpeg pkgconf
+      - uses: actions/checkout@v4
+      - name: Build
+        run: sh tools/linux-build.sh --yes --package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-plain
+          path: builds/ps3vis-linux.tar.gz
+
   windows:
     runs-on: windows-latest
     defaults:
@@ -72,7 +90,7 @@ jobs:
 
   release:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [linux, windows, macos]
+    needs: [linux, linux-plain, windows, macos]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -81,6 +99,7 @@ jobs:
         with:
           files: |
             linux/*
+            linux-plain/*
             windows/*
             macos/*
           generate_release_notes: true

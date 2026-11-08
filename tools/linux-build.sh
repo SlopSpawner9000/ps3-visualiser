@@ -6,17 +6,23 @@
 #   sh tools/linux-build.sh --yes       install missing packages without asking
 #   sh tools/linux-build.sh --install   also put it in ~/.local/bin and the app menu
 #   sh tools/linux-build.sh --clean     start from an empty build folder
+#   sh tools/linux-build.sh --package   also collect it into builds/ps3vis-linux(.tar.gz): just the
+#                                       binary and the fonts, no AppImage or Flatpak packaging.
+#                                       It links SDL3 and FFmpeg dynamically, so the target needs
+#                                       matching (or newer) packages installed - for a build that
+#                                       runs on any x86-64 Linux as-is, see appimage-build.sh instead.
 set -eu
 root=$(cd "$(dirname "$0")/.." && pwd)
 cd "$root"
 
-yes=0 install=0 clean=0
+yes=0 install=0 clean=0 package=0
 for arg in "$@"; do
     case $arg in
     --yes | -y) yes=1 ;;
     --install) install=1 ;;
     --clean) clean=1 ;;
-    -h | --help) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --package) package=1 ;;
+    -h | --help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Unknown option: $arg (see --help)" >&2; exit 2 ;;
     esac
 done
@@ -113,6 +119,32 @@ EOF
     have update-desktop-database && update-desktop-database "$appdir" >/dev/null 2>&1 || true
     echo "Installed: $bindir/ps3vis (and \"PS3 Visualizer\" in the app menu)"
     case ":$PATH:" in *":$bindir:"*) ;; *) echo "Note: $bindir isn't on your PATH; start it by its full path or from the app menu." ;; esac
+fi
+
+# --- Package: just the binary and the fonts in a folder, no AppImage or Flatpak.
+if [ "$package" = 1 ]; then
+    out=$root/builds/ps3vis-linux # (ready-to-run programs go to builds/; dist/ is for source packages)
+    rm -rf "$out"
+    mkdir -p "$out"
+    cp build/ps3vis "$out/"
+    cp -r fonts "$out/" # (the themes' free fonts)
+    cp README.md SETUP.md "$out/"
+    cat > "$out/START HERE.txt" <<'TXT'
+PS3 Visualizer for Linux (plain build)
+
+This is just the binary and its fonts, no AppImage or Flatpak container: it's linked against
+this system's SDL3 and FFmpeg, so the target needs matching (or newer) versions of those
+installed (see README.md, "Building") - it won't run as-is on an older distribution. For a build
+that runs on any x86-64 Linux without installing anything, see the AppImage instead.
+
+1. Install RPCS3 (https://rpcs3.net) and in it choose File > Install Firmware with the official
+   PS3UPDAT.PUP from playstation.com. This is a one-time step (see SETUP.md, part 1).
+2. ./ps3vis ~/Music
+TXT
+    mkdir -p "$root/builds"
+    (cd "$root/builds" && rm -f ps3vis-linux.tar.gz && tar -czf ps3vis-linux.tar.gz ps3vis-linux)
+    echo
+    echo "Packaged: $out (and $root/builds/ps3vis-linux.tar.gz)"
 fi
 
 # --- Firmware check (the player also asks for it on start-up when it's missing).

@@ -45,7 +45,9 @@ It checks for everything the build needs, offers to install what's missing (Arch
 Debian/Ubuntu, Fedora and openSUSE; it shows the command and asks first), builds the player into
 `build/`, and tells you whether it found the PS3 system software. Add `--install` to also put it in
 `~/.local/bin` with a *PS3 Visualizer* entry in your app menu, `--yes` to install packages without
-asking, or `--clean` to rebuild from scratch. Or do it by hand:
+asking, `--clean` to rebuild from scratch, or `--package` to also collect the binary and fonts into
+`builds/ps3vis-linux.tar.gz` (just that, no AppImage or Flatpak container - the target needs
+matching SDL3/FFmpeg packages installed). Or do it by hand:
 
 **Arch / CachyOS / Manjaro**
 ```sh
