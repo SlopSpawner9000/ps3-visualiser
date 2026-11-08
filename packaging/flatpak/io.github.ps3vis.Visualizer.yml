@@ -1,0 +1,76 @@
+# Flatpak build of the player (see tools/flatpak-build.sh). SDL3 and FFmpeg are built here: the
+# Freedesktop runtime has no SDL3, and its FFmpeg lacks codecs such as ATRAC. No firmware is
+# included: the player reads RPCS3's dev_flash at runtime (read-only permissions below).
+id: io.github.ps3vis.Visualizer
+runtime: org.freedesktop.Platform
+runtime-version: '26.08'
+sdk: org.freedesktop.Sdk
+command: ps3vis
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  # GPU (OpenGL/Vulkan) and game controllers (input / hidraw devices).
+  - --device=all
+  # RPCS3's firmware install (native and Flatpak RPCS3), read-only.
+  - --filesystem=~/.config/rpcs3:ro
+  - --filesystem=~/.var/app/net.rpcs3.RPCS3/config/rpcs3:ro
+  # Music: the Music folder and SD cards / USB drives (Steam Deck). Other places through the
+  # file chooser (portal), which grants access to what's picked.
+  - --filesystem=xdg-music:ro
+  - --filesystem=/run/media:ro
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /lib/cmake
+  - /share/doc
+  - /share/man
+  - '*.a'
+modules:
+  - name: ffmpeg
+    # Audio decoding only (LGPL): no programs, encoders, muxers, devices or filters.
+    config-opts:
+      - --enable-shared
+      - --disable-static
+      - --disable-programs
+      - --disable-doc
+      - --disable-avdevice
+      - --disable-avfilter
+      - --disable-swscale
+      - --disable-network
+      - --disable-encoders
+      - --disable-muxers
+      - --disable-devices
+      - --disable-x86asm
+      - --disable-debug
+    sources:
+      - type: archive
+        url: https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz
+        sha256: 8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e
+
+  - name: sdl3
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DSDL_STATIC=OFF
+      - -DSDL_TESTS=OFF
+      - -DSDL_EXAMPLES=OFF
+    sources:
+      - type: archive
+        url: https://github.com/libsdl-org/SDL/releases/download/release-3.4.18/SDL3-3.4.18.tar.gz
+        sha256: 9c75cf16330322c217dedd2e0609f1124f1b54b8633e763467b4684d0f4334a3
+
+  - name: ps3vis
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DPS3VIS_BUILD_TARGET=flatpak
+    sources:
+      # A clean copy of the sources made by tools/flatpak-build.sh (never devnotes/ or firmware).
+      - type: dir
+        path: ../../build-flatpak/source
+    post-install:
+      - install -Dm644 packaging/flatpak/io.github.ps3vis.Visualizer.desktop -t /app/share/applications
+      - install -Dm644 packaging/flatpak/io.github.ps3vis.Visualizer.svg -t /app/share/icons/hicolor/scalable/apps
+      - install -Dm644 packaging/flatpak/io.github.ps3vis.Visualizer.metainfo.xml -t /app/share/metainfo

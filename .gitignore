@@ -1,0 +1,21 @@
+/build/
+/build-*/
+# Sony firmware and console data: never commit these.
+/PS3-HDD-DATA/
+*.PUP
+*.pup
+*.sprx
+*.prx
+*.self
+*.qrc
+__pycache__/
+# Devnotes: RE data, test renders, and working notes - never commit.
+/devnotes/
+# Leftover misplaced theme test output.
+/1/
+/dist/
+/USER-DATA/
+deps/
+build-win/
+.flatpak-builder/
+/builds/

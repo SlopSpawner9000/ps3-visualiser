@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=PS3 Visualizer
+Comment=Music player with the PlayStation 3 music visualizer
+Exec=ps3vis %F
+Icon=io.github.ps3vis.Visualizer
+Terminal=false
+Categories=AudioVideo;Audio;Player;
+MimeType=audio/mpeg;audio/flac;audio/ogg;audio/x-wav;audio/mp4;audio/aac;audio/opus;audio/x-vorbis+ogg;inode/directory;
+Keywords=music;visualizer;visualiser;PS3;canyon;

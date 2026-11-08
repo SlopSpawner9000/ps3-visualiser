@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.ps3vis.Visualizer</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <name>PS3 Visualizer</name>
+  <summary>Music player with the PlayStation 3 music visualizer</summary>
+  <description>
+    <p>Plays your music with the PS3's "canyon" music visualizer, rendered from the PS3 system
+    software that you install yourself with the RPCS3 emulator (it is not included).</p>
+  </description>
+  <launchable type="desktop-id">io.github.ps3vis.Visualizer.desktop</launchable>
+  <content_rating type="oars-1.1"/>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>gamepad</control>
+  </supports>
+</component>
