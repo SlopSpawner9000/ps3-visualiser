@@ -19,7 +19,7 @@ rm -rf "$stage"
 mkdir -p "$stage/$name"
 tar --create --exclude='__pycache__' \
     SETUP.md README.md CMakeLists.txt .gitignore \
-    src third_party fonts docs tools/re tools/package.sh tools/windows-build.sh tools/linux-build.sh tools/flatpak-build.sh tools/appimage-build.sh packaging |
+    src third_party fonts docs tools/re tools/package.sh tools/windows-build.sh tools/linux-build.sh tools/macos-build.sh tools/flatpak-build.sh tools/appimage-build.sh packaging |
     tar --extract --directory "$stage/$name"
 
 (cd "$stage" && zip -qr "$out.zip" "$name" && tar --create --gzip --file "$out.tar.gz" "$name")

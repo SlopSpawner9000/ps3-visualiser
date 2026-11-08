@@ -68,6 +68,9 @@ nothing is found at start-up, the player asks you to locate your RPCS3 folder an
 brew install cmake ninja pkgconf sdl3 ffmpeg
 cmake -S . -B build -G Ninja && cmake --build build
 ```
+Or `sh tools/macos-build.sh` for a ready-to-share, self-contained `ps3vis.app` in `builds/`
+(see SETUP.md). It isn't notarized, so Gatekeeper calls it "unidentified developer" on first
+launch; right-click it and choose Open.
 
 Steam Deck / SteamOS and other locked-down systems: build a Flatpak with `sh tools/flatpak-build.sh`, or
 an AppImage to copy over with `sh tools/appimage-build.sh` (see SETUP.md).

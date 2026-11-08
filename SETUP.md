@@ -144,6 +144,10 @@ to `~/.local/share/ps3vis/`. For the Deck's Game Mode, add it to Steam as a non-
 brew install cmake ninja pkgconf sdl3 ffmpeg
 cmake -S . -B build -G Ninja && cmake --build build
 ```
+Or `sh tools/macos-build.sh` for a ready-to-share `ps3vis.app`, bundled with every library it
+needs (see `--help`): it installs the same Homebrew packages (plus `dylibbundler`) and zips the
+result into `builds/ps3vis-macos.zip`. It isn't notarized (that needs a paid Apple Developer ID),
+so Gatekeeper calls it "unidentified developer" on first launch; right-click it and choose Open.
 
 ## 3. Play music
 

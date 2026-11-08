@@ -1,0 +1,86 @@
+name: Release builds
+
+# Builds ps3vis for Linux, Windows and macOS using GitHub-hosted runners (free for public
+# repositories) and, on a version tag, publishes them as a GitHub Release. No paid services or
+# accounts are used anywhere in this workflow (no code signing, no notarization).
+#
+# Trigger a build without making a release: Actions tab > Release builds > Run workflow.
+# Make a release: push a tag like v1.0.0 (git tag v1.0.0 && git push origin v1.0.0).
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install flatpak (the AppImage build's sandboxed build environment)
+        run: sudo apt-get update && sudo apt-get install -y flatpak dbus-x11
+      - name: Build
+        run: dbus-run-session -- sh tools/appimage-build.sh --yes
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            builds/*.AppImage
+            builds/*-portable.tar.gz
+
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-pkgconf
+            git
+            curl
+            zip
+            unzip
+      - name: Build
+        run: tools/windows-build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: builds/ps3vis-windows.zip
+
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: sh tools/macos-build.sh --yes
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: builds/ps3vis-macos.zip
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [linux, windows, macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            linux/*
+            windows/*
+            macos/*
+          generate_release_notes: true
