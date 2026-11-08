@@ -376,6 +376,8 @@ Debug tab options:
 - *Dump: hardware details* / *Dump: software details* add `[hardware]` (CPU, GPU, RAM, displays,
   audio devices) and `[software]` (OS, desktop session, SDL/OpenGL/FFmpeg versions, compiler)
   sections to `state.txt`.
+- *Open data folder* opens the folder with `settings.ini`, the UI themes and debug dumps in your
+  file manager.
 - *Stress tests* (never saved; they reset on restart, and a red banner lists the active ones; the frame rate limit
   alone gets no banner, but is listed when other tests run): frame
   rate limit (VSync / Unlocked / caps at 30–240 fps; unlocked uses an immediate present mode with HDR

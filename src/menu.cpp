@@ -778,6 +778,7 @@ std::vector<Menu::Row> Menu::settingsRows(Context &c)
                     [&s, changed](int) { s.dumpSoftware = !s.dumpSoftware; changed(); }, nullptr});
     rows.push_back({"Dump: hide personal info", s.dumpRedact ? "On" : "Off",
                     [&s, changed](int) { s.dumpRedact = !s.dumpRedact; changed(); }, nullptr});
+    rows.push_back({"Open data folder", "", nullptr, [&c] { if (c.openDataFolder) c.openDataFolder(); }});
     {
         StressTest &st = s.stress;
         auto cycle = [changed](int &v, int n) { return [&v, n, changed](int d) { v = (v + d + n) % n; changed(); }; };
@@ -1303,6 +1304,8 @@ static const char *rowHelp(int tab, const std::string &label)
         {"Dump: hide personal info", "Removes your user name, computer name, IP and MAC addresses and e-mail addresses "
                                      "from debug dumps (paths in your home folder become ~). Leave it on unless "
                                      "asked otherwise."},
+        {"Open data folder", "Opens the folder with settings.ini, the UI themes and debug dumps in your file "
+                             "manager."},
         {"Shuffle repeat gap", "With shuffle on, a track that just played waits until this share of the playlist has "
                                "played before it can come up again. 0% only avoids playing the same track twice in a "
                                "row. Shift: 1% steps."},
@@ -1559,7 +1562,7 @@ std::vector<Menu::Row> Menu::rowsFor(Context &c)
                                       "Background CPU load", "Stop all stress tests"}},
         {"Logging & debug dumps", {"Show settings keys in tooltips", "Show current values", "Show valid values",
                                    "Extensive logging", "Debug dump key", "Dump: hardware details",
-                                   "Dump: software details", "Dump: hide personal info"}},
+                                   "Dump: software details", "Dump: hide personal info", "Open data folder"}},
     };
     const bool earthMode = c.settings.visualizer == 1;
     const auto &sections = tab_ == 5 ? misc : tab_ == 6 ? debug : earthMode ? earthSections : visualizer;

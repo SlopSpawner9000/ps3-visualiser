@@ -206,6 +206,7 @@ public:
         std::function<void(const std::vector<std::string> &)> addPaths = {}; // add files/folders to the playlist
         std::function<std::vector<std::string>()> earthViews = {};          // the earth's view names (empty until loaded)
         std::function<void()> exportTheme = {}; // write the current theme into the themes folder and switch to it
+        std::function<void()> openDataFolder = {}; // open settings.ini's folder in the OS's file browser
     };
 
     bool isOpen() const { return open_; }

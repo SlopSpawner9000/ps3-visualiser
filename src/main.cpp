@@ -152,6 +152,33 @@ fs::path exeDir()
     return base ? pathFromUtf8(base) : fs::current_path();
 }
 
+// A "file://" URI for SDL_OpenURL: a plain path isn't reliably understood on every platform
+// (e.g. macOS needs a proper URL, not a raw filesystem path), and these folders can contain
+// spaces ("PS3 Visualizer").
+std::string fileUrl(const fs::path &p)
+{
+    std::error_code ec;
+    std::string path = utf8(fs::absolute(p, ec));
+#ifdef _WIN32
+    for (char &ch : path)
+        if (ch == '\\')
+            ch = '/';
+    std::string out = "file:///";
+#else
+    std::string out = "file://";
+#endif
+    for (unsigned char ch : path) {
+        if (std::isalnum(ch) || ch == '/' || ch == '-' || ch == '_' || ch == '.' || ch == '~' || ch == ':') {
+            out += char(ch);
+        } else {
+            char buf[4];
+            std::snprintf(buf, sizeof buf, "%%%02X", ch);
+            out += buf;
+        }
+    }
+    return out;
+}
+
 std::vector<fs::path> fontFiles(const fs::path &devFlash)
 {
     std::vector<fs::path> out;
@@ -1728,10 +1755,11 @@ int main(int argc, char **argv)
 
     // Saved settings, overridden by the command line (loaded early: the HDR choice
     // decides how the window is created).
-    fs::path settingsFile, themesDir;
+    fs::path settingsFile, themesDir, dataDir;
     if (char *pref = SDL_GetPrefPath("ps3vis", "PS3 Visualizer")) {
-        settingsFile = pathFromUtf8(pref) / "settings.ini";
-        themesDir = pathFromUtf8(pref) / "themes";
+        dataDir = pathFromUtf8(pref);
+        settingsFile = dataDir / "settings.ini";
+        themesDir = dataDir / "themes";
         SDL_free(pref);
     }
     // The themes' bundled free fonts: next to the program (Windows, a build folder's ../fonts) or installed.
@@ -2582,6 +2610,15 @@ int main(int argc, char **argv)
                               ui.notice = "Saved the theme as " + utf8(file) + ". Edit it in a text editor, then reopen "
                                           "this menu to see the changes.";
                               ui.noticeUntil = now() + 12.0;
+                          },
+                          [&] { // Debug > Open data folder
+                              if (dataDir.empty())
+                                  return;
+                              std::error_code ec;
+                              fs::create_directories(dataDir, ec);
+                              if (!SDL_OpenURL(fileUrl(dataDir).c_str()))
+                                  SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "couldn't open %s: %s", utf8(dataDir).c_str(),
+                                              SDL_GetError());
                           }};
 
     auto runAction = [&](Action a) {
