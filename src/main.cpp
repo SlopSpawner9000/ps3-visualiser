@@ -1669,7 +1669,7 @@ int main(int argc, char **argv)
         const SDL_MessageBoxData box{SDL_MESSAGEBOX_INFORMATION, nullptr, "PS3 Visualizer",
                                      "The PS3 system software files (dev_flash) weren't found.\n\n"
                                      "Install PS3UPDAT.PUP in RPCS3 (File > Install Firmware), then choose "
-                                     "the RPCS3 folder (the one with rpcs3.exe / dev_flash in it).",
+                                     "the RPCS3 folder (the one with RPCS3 installed, or dev_flash, in it).",
                                      2, buttons, nullptr};
         int choice = 0;
         if (!SDL_ShowMessageBox(&box, &choice)) {
@@ -1683,6 +1683,10 @@ int main(int argc, char **argv)
             bool done = false;
             std::string path;
         } pick;
+        // macOS: unlike the message box above, SDL_ShowOpenFolderDialog needs a real parent window to
+        // actually display - without one it fails silently and the callback fires immediately with
+        // nothing picked. No window exists yet this early, so make a throwaway hidden one just for this.
+        SDL_Window *dialogWindow = SDL_CreateWindow("PS3 Visualizer", 1, 1, SDL_WINDOW_HIDDEN);
         SDL_ShowOpenFolderDialog(
             [](void *user, const char *const *list, int) {
                 auto *p = static_cast<Pick *>(user);
@@ -1690,11 +1694,13 @@ int main(int argc, char **argv)
                     p->path = list[0];
                 p->done = true;
             },
-            &pick, nullptr, nullptr, false);
+            &pick, dialogWindow, nullptr, false);
         while (!pick.done) {
             SDL_PumpEvents();
             SDL_Delay(20);
         }
+        if (dialogWindow)
+            SDL_DestroyWindow(dialogWindow);
         if (pick.path.empty())
             continue;
         devFlash = findDevFlash(pick.path, exeDir());
